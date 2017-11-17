@@ -2,15 +2,16 @@ package library.ai;
 
 import java.util.ArrayList;
 
+interface Func {
+	float call(float i);
+}
+
 public class Brain {
-	interface Func {
-		float call(float i);
-	}
-	
 	public final ArrayList< ArrayList<Node> > nodes;
 	public final ArrayList<Node> first;
 	public final ArrayList<Node> last;
 	public Func function;
+	public int errorCount = 0;
 	
 	public Brain(int[] nodeCount) {
 		nodes = new ArrayList< ArrayList<Node> >();
@@ -19,11 +20,7 @@ public class Brain {
 			nodes.add( new ArrayList<Node>() );
 			
 			for (int i = 0; i < nodeCount[p]; i++) {
-				if (p == 0) {
-					nodes.get(p).add( new Node( new ArrayList<Node>() , this ) );
-				} else {
-					nodes.get(p).add( new Node( nodes.get(p - 1) , this ) );
-				}
+				nodes.get(p).add( new Node( p , this ) );
 			}
 		}
 		
@@ -53,5 +50,33 @@ public class Brain {
 			}
 		}
 		return n;
+	}
+
+	public void error(float[] expected) {
+		errorCount++;
+		//reset error
+		for (ArrayList<Node> nl : nodes) {
+			for (Node n : nl) {
+				n.expected = 0;
+			}
+		}
+		//set error
+		for (int i = 0; i < last.size(); i++) {
+			last.get(i).expected = expected[i];
+		}
+		for (int i = nodes.size() - 1; i >= 0; i--) {
+			for (Node n : nodes.get(i)) {
+				n.error();
+			}
+		}
+	}
+	
+	public void correct() {
+		for (int i = nodes.size() - 1; i >= 0; i--) {
+			for (Node n : nodes.get(i)) {
+				n.correct();
+			}
+		}
+		errorCount = 0;
 	}
 }

@@ -9,7 +9,17 @@ public class Main {
 	public static void main(String[] args) {
 		Brain brain = new Brain( brainSize );
 		
-		System.out.println( Q[0] + ") got " + brain.value( toArray(Q[0]) ) + " | expected " + A[0] );
+		int l = 100; // number of loops
+		int s = 2; // number of digits to use
+		
+		for (int i = 1; i < s * l - 1 + s; i++) {
+			System.out.println( Q[i % s] + ") got " + brain.value( toArray(Q[i % s]) ) + " | expected " + A[i % s] );
+			brain.error( toArray(A[i % s]) );
+			if (i % s == 0) {
+				brain.correct();
+				System.out.println();
+			}
+		}
 	}
 	
 	public static float[] toArray(int i) {
