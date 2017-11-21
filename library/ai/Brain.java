@@ -35,8 +35,8 @@ public class Brain {
 			first.get(i).input( inputs[i] );
 		}
 		
-		for (ArrayList<Node> nl : nodes) {
-			for (Node n : nl) {
+		for (int nl = 1; nl < nodes.size(); nl++) {
+			for (Node n : nodes.get(nl)) {
 				n.calcValue();
 			}
 		}

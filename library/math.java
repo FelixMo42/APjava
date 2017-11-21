@@ -6,7 +6,7 @@ public class math {
 	}
 	
 	public static int random(int max) {
-		return random(1,max);
+		return random(0,max);
 	}
 	
 	public static float frandom(int min, int max) {

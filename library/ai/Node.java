@@ -3,7 +3,7 @@ package library.ai;
 import java.util.ArrayList;
 
 public class Node {
-	public static float evolution = 0.7f;
+	public static float evolution = 0.25f;
 	
 	public final float[] weights;
 	
@@ -12,9 +12,9 @@ public class Node {
 	public final ArrayList<Node> into;
 	public final int positionSize;
 	
-	private float[] correction;
-	private Brain brain;
-	private float value;
+	public float[] correction; // make this block private latter
+	public Brain brain;
+	public float value;
 	
 	public Node(int position , Brain parent) {
 		positionSize = parent.nodes.get(position).size();
@@ -51,7 +51,7 @@ public class Node {
 	
 	public void error() {
 		for (int i = 0; i < into.size(); i++) {
-			correction[i] += expected - (into.get(i).getValue() * weights[i]);
+			correction[i] += (expected - (into.get(i).getValue() * weights[i])) * into.get(i).getValue();
 			into.get(i).expected += expected * weights[i] / positionSize;
 		}
 	}
