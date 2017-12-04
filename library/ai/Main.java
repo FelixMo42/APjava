@@ -1,22 +1,43 @@
 package library.ai;
 
 public class Main {
-	public static final int[] brainSize = {10,10};
+	public static final int[] brainSize = {20,20};
 	
-	public static int l = 1000; // number of loops
+	public static int l = 100; // number of loops
 	public static int s = 17; // number of digits to use
 	
-	public static int[] Q = {0,1,2,3,4,5,6,7,8,9};
-	public static int[] A = {0,1,2,3,4,5,6,7,8,9};
+	//public static int[] Q = {0,1,2,3,4,5,6,7,8,9};
+	//public static int[] A = {0,1,2,3,4,5,6,7,8,9};
+	//public static void init() {}
 	
-	//do not change these variables
+	public static String[] Q;
+	public static int[] A;
+			
+	
+	public static void init() {
+		Q = new String[100];
+		A = new int[100];
+		int i = 0;
+		for (int f = 0; f < 10; f++) {
+			for (int s = 0; s < 10; s++) {
+				Q[i] = "" + f + s;
+				A[i] = f + s;
+				i++;
+			}
+		}
+	}
+	
+    // ------------------------------------------------------------------------------------------------- \\
+ // --------------------------------- // do not change these variables \\ --------------------------------- \\
+    // ------------------------------------------------------------------------------------------------- \\
 	
 	public static int[] I;
 	public static Brain brain = new Brain( brainSize );
 	
 	public static void main(String[] args) {
+		init();
 		//populate Index array I;
-		I = new int[ (s / Q.length + s % Q.length / (Q.length/2)) * Q.length ];
+		I = new int[ (s / Q.length + s % Q.length / (Q.length/2) + 1) * Q.length ];
 		for (int i = 0; i < I.length; i++) {
 			I[i] = i % Q.length;
 		}
@@ -42,7 +63,7 @@ public class Main {
 		float[] r = new float[ brainSize[0] ];
 		int i = 0;
 		for (int c : s.chars().toArray()) {
-			r[i] = c;
+			r[i] = (c - 48) / 10f;
 			i++;
 		}
 		return r;

@@ -12,7 +12,7 @@ public class Node {
 	public final ArrayList<Node> into;
 	public final int positionSize;
 	
-	public float[] correction; // make this block private latter
+	public float[] correction;
 	public Brain brain;
 	public float value;
 	
