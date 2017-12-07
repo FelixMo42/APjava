@@ -1,23 +1,43 @@
-package Phantasia;
+package phantasia;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import org.json.*;
 
 public class Chatbot {
+	public String greeting = "Welcom to Phantasia the RP chat bot.";
 	
-	public final String greating = "Welcom to Phantasia the RP chat bot.";
+	private JSONObject data;
 	
-	private Response[] responses  = {
-		new Response( new Response[] {}  )	
-	};
+	public Chatbot(String path) {
+		try {
+			init(path);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Chatbot() {
+		try {
+			init("phantasia/data.json");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void init(String path) throws FileNotFoundException {
+		Scanner scanner;
+		scanner = new Scanner(new File("src/phantasia/data.json"), "UTF-8");
+		String json = scanner.useDelimiter("\\A").next();
+		scanner.close();
+		
+		data = new JSONObject(json);
+	}
 	
 	public String getResponse(String inpt) {
-		inpt = inpt.replaceAll("[.,'\"!?]" , " ");
-		Response[] rsp = responses;
-		
-		inpt = inpt.replaceFirst("^0+(?!$)", "");
-		for (Response r : rsp) {
-			if ( r.is(this , inpt) ) {
-				rsp = r.responses;
-			}
-		}
+		inpt = "_ " + inpt.replaceAll("[.,'\"!?]" , " ").toLowerCase();
+		inpt = inpt.replaceFirst("[ ]*[^ ]*[ ]*", "");
 		
 		return inpt;
 	}
