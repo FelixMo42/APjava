@@ -1,5 +1,23 @@
 {
-	"what" : {
-		"response" : ""
-	}
+	"keys" : [
+		{
+			"is" : "what",
+			"keys" : [
+				{
+					"is" : "name",
+					"keys" : [],
+					"response" : "My name is Phantasia, I am your DM."
+				}
+			],
+			"response" : "What a what?"
+		},
+		{
+			"is" : "is",
+			"keys" : [
+
+			],
+			"response" : ""
+		}
+	],
+	"response" : "hi"
 }
