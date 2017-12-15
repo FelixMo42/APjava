@@ -7,26 +7,30 @@ import java.util.*;
 public class Client {
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		String inpt;
-		String outpt;
 		
-		Scanner console = new Scanner(System.in);
+		Scanner user = new Scanner(System.in);
 		
-		Socket clientSocket = new Socket("localhost", 6792);
-		DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-		Scanner in = new Scanner( new InputStreamReader(clientSocket.getInputStream()) );
+		Socket socket = new Socket("localhost", 6792);
+		PrintStream out = new PrintStream(socket.getOutputStream());
+		Scanner in = new Scanner( new InputStreamReader(socket.getInputStream()) );
+		
+		System.out.println("connected");
 		
 		while (true) {
-			inpt = console.next();
-			out.writeBytes(inpt + '\n');
-			outpt = in.next();
-			System.out.println("FROM SERVER: " + outpt);
-			if ( inpt.equals("quit") ) {
-				break;
+			if ( user.hasNext() ) {
+				inpt = user.next();
+				out.println(inpt);
+				System.out.println("sent");
+				if ( inpt.equals("quit") ) {
+					break;
+				}
+			}
+			if ( in.hasNext() ) {
+				System.out.println( in.nextLine() );
 			}
 		}
-		
 		in.close();
-		console.close();
-		clientSocket.close();
+		user.close();
+		socket.close();
 	}
 }
