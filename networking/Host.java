@@ -6,87 +6,111 @@ import java.util.*;
 
 public class Host {
 	private static class Client implements Runnable {
-		private Thread thread = new Thread(this, "");
+		public Thread thread = new Thread(this, "Client " + connections.size());
+		public Socket client;
 		
-		public Client() {
+		public Client(Socket socket) {
+			client = socket;
 			thread.start();
 		}
 		
 		public void run() {
 			try {
-				Socket socket = Host.socket.accept();
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				PrintStream out = new PrintStream(socket.getOutputStream());
-				
-				Host.next = true;
-				Host.connect(socket, in, out);
-				
+				BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+				PrintStream out = new PrintStream(client.getOutputStream());
+				connect(client, in, out);
 				in.close();
 				out.println( "quiting server" );
+				System.out.println( thread.getName() + " out!" );
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		public void close() {
-			thread.interrupt();
+	}
+	
+	private static class Main implements Runnable {
+		public void run() {
+			try {
+				while ( true ) {
+					connections.add( new Client( socket.accept() ) );
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public volatile static boolean active = true;
-	public volatile static boolean next = true;
-	public volatile static ServerSocket socket;
-	public volatile static ArrayList<String> log;
+	public static String ip;
+	public static int port;
 	
-	public static void main(String[] args) {
+	private volatile static boolean active = false;
+	private volatile static ArrayList<String> log;
+	private static Thread mainLoop;
+	private static ServerSocket socket;
+	private static ArrayList<Client> connections = new ArrayList<Client>();
+	
+	public static void main(String[] args) throws IOException {
+		//open every thing up
+		active = true;
+		log = new ArrayList<String>();
+		socket = new ServerSocket(0);
+		//set up connection info
+		ip = Info.getLocalIp();
+		port = socket.getLocalPort();
+        Info.request("http://www.mosegames.com/school.php", "PUT", Info.getWebIp() + "\n" + ip + "\n" + port);
+        //main loop
+        Main main = new Main();
+        mainLoop = new Thread(main, "MainLoop");
+        mainLoop.start();
+	}
+	
+	public static void close() {
+		if (!active) { return; }
+		active = false;
+		mainLoop.interrupt();
+		System.out.println("main loop quit!");
+		for (Client client : connections) {
+			try {
+				client.thread.join();
+				System.out.println("connect closed!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("all connections closed!");
 		try {
-			run();
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("scoket closed!");
+	}
+	
+	public static void run() {
+		try {
+			main( new String[0] );
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void run() throws IOException {
-		//get ip address
-        InetAddress iAddress = InetAddress.getLocalHost();
-        String server_IP = iAddress.getHostAddress();
-        System.out.println("Server IP address : " + server_IP);
-		//open every thing up
-		BufferedReader user = new BufferedReader( new InputStreamReader(System.in) );
-		log = new ArrayList<String>();
-		socket = new ServerSocket(6792);
-		ArrayList<Client> connections = new ArrayList<Client>();
-		//main loop
-		while ( active ) {
-			if ( next ) {
-				connections.add( new Client() );
-				next = false;
-			}
-			if ( user.ready() ) {
-				String inpt = user.readLine();
-				if ( inpt.equals("close") ) {
-					active = false;
-				}
-			}
-		}
-		//close every thing up
-		for (Client c : connections) {
-			c.close();
-		}
-		user.close();
-		socket.close();
-		System.out.println( "server closed" );
-	}
-	
 	private static void connect(Socket socket, BufferedReader in, PrintStream out) throws IOException {
-		out.println( "==~ Welcome to ChatterBox!" );
+		while ( !in.ready() ) {}
+		String status = in.readLine();
 		int pos = 0;
+		if ( status.equals("n") ) {
+			pos = Math.max(0, log.size() - 10);
+			out.println( "==~ Welcome to ChatterBox!" );
+		} else if ( status.equals("o") ) {
+			pos = log.size();
+		} else if ( !status.equals("a") ) {
+			return;
+		}
 		while ( active ) {
 			if ( in.ready() ) {
 				String inpt = in.readLine();
-				if (inpt.equals("quit")) { break; }
+				if (inpt.equals("\\quit")) { break; }
 				log.add( inpt );
-				System.out.println( log.size() + ": " + inpt );
 				pos++;
 			}
 			if ( log.size() > pos ) {

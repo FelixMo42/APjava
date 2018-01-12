@@ -1,29 +1,29 @@
 package networking;
 
 import java.io.*;
-import java.util.*;
 
 public class Main {
-	static String name = "";
-	
-	public static void main(String[] args) {
-		//if not server
-			//create server
-			//tell every one
-		//else
-			//connect to it
-		
-		Scanner user = new Scanner( System.in );
+	public static void main(String[] args) throws IOException {
+        String[] data = Info.request("http://www.mosegames.com/school.php", "GET", Info.getWebIp() ).split("[\\r\\n]+");
+		BufferedReader user = Client.input;
 		
 		System.out.print("Enter user name: ");
-		name = user.nextLine();
+		String name = user.readLine();
 		
-		user.close();
-		
+		Client.ip = data[0];
+		Client.port = Integer.parseInt( data[1] );
 		Client.inFunc = (String s) -> { return name + ": " + s; };
 		Client.enterText = "==~ " + name + " has joined the chat.";
 		Client.exitText = "==~ " + name + " has left the chat.";
 		
+		if ( !Info.portOpen(Client.ip, Client.port) ) {
+			Host.run();
+			Client.ip = Host.ip;
+			Client.port = Host.port;
+		}
+		
 		Client.run();
+		
+		Host.close();
 	}
 }
