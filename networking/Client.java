@@ -27,16 +27,15 @@ public class Client {
 		in = new BufferedReader( new InputStreamReader(socket.getInputStream()) );
 		
 		out.println( status );
-		
-		if ( !enterText.equals("") ) {
+		if ( status == "n" && !enterText.equals("") ) {
 			out.println(enterText);
 		}
+		status = "o";
 		
 		while (true) {
 			if ( input.ready() ) {
 				String inpt = input.readLine();
 				if ( inpt.startsWith("\\") ) {
-					//quit
 					if ( inpt.equals("\\quit") ) {
 						if ( !exitText.equals("") ) {
 							out.println(exitText);
@@ -49,21 +48,31 @@ public class Client {
 				}
 			}
 			if ( in.ready() ) {
-				System.out.println( outFunc.call( in.readLine() ) );
+				String outpt = in.readLine();
+				if ( outpt.startsWith("\\") ) {
+					if ( outpt.equals("\\host") ) {
+						Main.Host();
+						break;
+					} else if ( outpt.equals("\\reconnect") ) {
+						if ( !Host.active ) {
+							Main.Run();
+							break;
+						}
+					}
+				} else {
+					System.out.println( outFunc.call( outpt ) );
+				}
 			}
 		}
 		
 		in.close();
-		input.close();
 		socket.close();
 	}
 	
 	public static void run() {
 		try {
 			main( new String[0] );
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} catch (IOException e) { e.printStackTrace(); }
 	}
 	
 	public static void print(String msg) {
