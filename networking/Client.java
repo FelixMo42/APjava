@@ -16,10 +16,9 @@ public class Client {
 	public static String status = "n";
 	public static String ip = "10.137.41.82";
 	public static int port = 6792;
-	
-	private static Socket socket;
-	private static PrintStream out;
-	private static BufferedReader in;
+	public static Socket socket;
+	public static PrintStream out;
+	public static BufferedReader in;
 	
 	public static void main(String[] args) throws IOException  {
 		socket = new Socket(ip, port);
@@ -51,12 +50,12 @@ public class Client {
 				String outpt = in.readLine();
 				if ( outpt.startsWith("\\") ) {
 					if ( outpt.equals("\\host") ) {
-						Main.Host();
-						break;
+						Main.host();
+						return;
 					} else if ( outpt.equals("\\reconnect") ) {
 						if ( !Host.active ) {
-							Main.Run();
-							break;
+							Main.run();
+							return;
 						}
 					}
 				} else {
@@ -66,6 +65,7 @@ public class Client {
 		}
 		
 		in.close();
+		out.close();
 		socket.close();
 	}
 	

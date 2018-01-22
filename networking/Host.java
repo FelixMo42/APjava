@@ -104,21 +104,22 @@ public class Host {
 			if (i < 0) { return; }
 		}
 		String status = in.readLine();
+		
 		int pos = 0;
 		if ( status.equals("n") ) {
-			//pos = Math.max(0, log.size() - 10);
+			pos = Math.max(0, log.size() - 10);
 			out.println( "==~ Welcome to ChatterBox!" );
 		} else if ( status.equals("o") ) {
-			//pos = log.size();
+			pos = log.size();
 		} else if ( !status.equals("a") ) {
 			return;
 		}
+		
 		while ( active ) {
 			if ( !client.occupy && in.ready() ) {
 				String inpt = in.readLine();
 				if (inpt.equals("\\quit")) { break; }
 				log.add( inpt );
-				pos++;
 			}
 			if ( log.size() > pos ) {
 				out.println( log.get(pos) );

@@ -13,33 +13,41 @@ public class Main {
 		Client.enterText = "==~ " + name + " has joined the chat.";
 		Client.exitText = "==~ " + name + " has left the chat.";
 		
-		Run();
+		run();
 		
 		Host.close();
 		user.close();
 	}
 	
-	public static void Host() {
+	public static void host() {
 		Host.run();
 		Client.ip = Host.ip;
 		Client.port = Host.port;
 		Info.request("http://www.mosegames.com/school.php", "PUT", Info.getWebIp() + "\n" + Host.ip + "\n" + Host.port);
-		Connect();
+		connect();
 	}
 	
-	public static void Run() {
+	public static void run() {
 		String[] data = Info.request("http://www.mosegames.com/school.php", "GET", Info.getWebIp() ).split("[\\r\\n]+");
 		Client.ip = data[0];
 		Client.port = Integer.parseInt( data[1] );
 		
 		if ( !Info.portOpen(Client.ip, Client.port) ) {
-			Host();
+			host();
 		} else {
-			Connect();
+			connect();
 		}
 	}
 	
-	public static void Connect() {
+	public static void connect() {
+		if ( Client.socket != null && Client.socket.isConnected() ) {
+			Client.out.println("\\quit");
+			try {
+				Client.in.close();
+				Client.out.close();
+				Client.socket.close();
+			} catch (IOException e) { e.printStackTrace(); }
+		}
 		Client.run();
 	}
 }
